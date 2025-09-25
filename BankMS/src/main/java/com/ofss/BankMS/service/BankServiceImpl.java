@@ -27,8 +27,6 @@ public class BankServiceImpl implements BankService{
         return ResponseEntity.ok(bankResponseDTOList);
     }
 
-
-
     @Override
     public ResponseEntity<?> createBank(BankRequestDTO bank) {
         Bank newBank = new Bank();
@@ -68,12 +66,12 @@ public class BankServiceImpl implements BankService{
     }
 
     @Override
-    public ResponseEntity<?> deleteBank(Long id) {
-        if (bankRepository.findById(id).isPresent()) {
-            bankRepository.deleteById(id);
+    public ResponseEntity<?> deleteBank(String bankName) {
+        if (bankRepository.findByBankName(bankName).isPresent()) {
+            bankRepository.deleteByBankName(bankName);
             return ResponseEntity.ok("Bank deleted Successfully");
         } else {
-            return ResponseEntity.status(404).body("Bank not found with id: " + id);
+            return ResponseEntity.status(404).body("Bank not found with name: " + bankName);
         }
     }
 
@@ -99,6 +97,17 @@ public class BankServiceImpl implements BankService{
         bankRepository.save(prevBank);
         return ResponseEntity.ok(prevBank);
     }
+
+    @Override
+    public ResponseEntity<?> getBankByName(String bankName) {
+        Optional<Bank> bank= bankRepository.findByBankName(bankName);
+        if(bank.isPresent()){
+            return ResponseEntity.ok(bank);
+        }
+        return null;
+    }
+
+//    ----------------------Helper Methods----------------------
     private List<BankResponseDTO> getBankResponseDTOList(List<Bank> banks) {
         return banks.stream().map(this::getBankResponse).toList();
     }

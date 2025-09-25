@@ -14,7 +14,9 @@ public interface BankService {
 
     ResponseEntity<?> updateBank(Long id, BankRequestDTO bankRequestDTO);
 
-    ResponseEntity<?> deleteBank(Long id);
+    ResponseEntity<?> deleteBank(String bankName);
 
     ResponseEntity<?> partialUpdateBank(Long id, BankRequestDTO bankRequestDTO);
+
+    ResponseEntity<?> getBankByName(String bankName);
 }
