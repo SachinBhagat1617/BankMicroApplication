@@ -14,12 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
-    @GetMapping
-    public ResponseEntity<ResponseDTO> getAllCustomers(){
-        return customerService.getAllCustomers();
-    }
-    @GetMapping("/customerId")
-    public ResponseEntity<ResponseDTO> getCustomersById(@RequestParam Long customerId) {
+
+    @GetMapping("/customerId/{customerId}")
+    public ResponseEntity<Object> getCustomersById(@PathVariable Long customerId) {
+        System.out.println("customerId is "+customerId);
         return customerService.getCustomersById(customerId);
     }
     @PostMapping
@@ -33,5 +31,13 @@ public class CustomerController {
     @DeleteMapping("/customerId/{customerId}")
     public ResponseEntity<ResponseDTO> deleteCustomer(@PathVariable Long customerId) {
         return customerService.deleteCustomer(customerId);
+    }
+    @PutMapping("/updateAccountNumber/customerId/{customerId}/accountNumber/{accountNumber}")
+    public ResponseEntity<Object> updateAccountNumber(@PathVariable Long customerId, @PathVariable String accountNumber) {
+        return customerService.updateAccountNumber(customerId, accountNumber);
+    }
+    @GetMapping
+    public ResponseEntity<ResponseDTO> getAllCustomers(){
+        return customerService.getAllCustomers();
     }
 }

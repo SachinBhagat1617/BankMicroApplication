@@ -14,5 +14,7 @@ public interface CustomerService {
 
     ResponseEntity<ResponseDTO> deleteCustomer(Long customerId);
 
-    ResponseEntity<ResponseDTO> getCustomersById(Long customerId);
+    ResponseEntity<Object> getCustomersById(Long customerId);
+
+    ResponseEntity<Object> updateAccountNumber(Long customerId, String accountNumbers);
 }

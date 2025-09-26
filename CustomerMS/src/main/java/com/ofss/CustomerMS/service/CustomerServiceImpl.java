@@ -140,19 +140,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<ResponseDTO> getCustomersById(Long customerId) {
+    public ResponseEntity<Object> getCustomersById(Long customerId) {
         if ( customerId <= 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder()
                     .message("Customer ID must be provided in the request parameter")
                     .data(null)
                     .build());
         }
+
         Optional<Customer> existingCustomer = customerRepository.findByCustomerId(customerId);
         if (existingCustomer.isPresent()) {
-            return ResponseEntity.ok(ResponseDTO.builder()
-                    .message("Customer retrieved successfully")
-                    .data(getCustomerResponseDTO(existingCustomer.get()))
-                    .build());
+            return ResponseEntity.ok(existingCustomer.get());
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.builder()
@@ -160,6 +158,34 @@ public class CustomerServiceImpl implements CustomerService {
                     .data(null)
                     .build());
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> updateAccountNumber(Long customerId, String accountNumbers) {
+        if (customerId == null || customerId < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder()
+                    .message("Customer ID must be provided in the request parameter")
+                    .data(null)
+                    .build());
+        }
+        if (accountNumbers == null || accountNumbers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseDTO.builder()
+                    .message("Account number must be provided in the request parameter")
+                    .data(null)
+                    .build());
+        }
+        Optional<Customer> existingCustomer = customerRepository.findByCustomerId(customerId);
+        System.out.println(existingCustomer.get().getCustomerName());
+        if (existingCustomer.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseDTO.builder()
+                    .message("Customer not found with customerId: " + customerId)
+                    .data(null)
+                    .build());
+        }
+        Customer customer = existingCustomer.get();
+        customer.setAccountNumber(accountNumbers);
+        Customer savedCustomer=customerRepository.save(customer);
+        return ResponseEntity.ok(savedCustomer);
     }
 
 
