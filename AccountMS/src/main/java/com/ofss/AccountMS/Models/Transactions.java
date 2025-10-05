@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity(name = "TRANSACTION_MICRO_DB")
 @Data
 @AllArgsConstructor
+@Builder
 public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +24,9 @@ public class Transactions {
     private Double amount;
 
     @NotBlank
-    private Long fromAccountId;
+    private String fromAccountNumber;
     @NotBlank
-    private Long toAccountId;
+    private String toAccountNumber;
 
     @CreationTimestamp
     private String transactionDate;

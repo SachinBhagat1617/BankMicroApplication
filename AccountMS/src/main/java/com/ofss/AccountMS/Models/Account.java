@@ -5,10 +5,12 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "ACCOUNT_MICRO_DB")
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Account {
     @Id
@@ -41,4 +43,7 @@ public class Account {
 
     @Column(name="IFSCCODE",nullable = false)
     private String ifscCode;
+
+//    @Enumerated(EnumType.STRING)
+//    private AccountStatus accountStatus;
 }

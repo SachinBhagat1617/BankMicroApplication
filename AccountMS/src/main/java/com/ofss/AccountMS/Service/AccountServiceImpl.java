@@ -12,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,12 @@ public class AccountServiceImpl implements AccountService{
         // Validate initial deposit based on account type
         if(!validateInitialDeposit(accountRequest.getInitialDeposit(), accountRequest.getAccountType())){
             return ResponseEntity.badRequest().body(new ResponseDTO("Insufficient initial deposit for " + accountRequest.getAccountType() + " account", 400, null));
+        }
+        if(accountRepository.existsByAadhaarNumber(accountRequest.getAadhaarNumber())){
+            return ResponseEntity.badRequest().body(new ResponseDTO("Account already exists with the provided Aadhaar number", 400, null));
+        }
+        if(accountRepository.existsByPanNumber(accountRequest.getPanNumber())){
+            return ResponseEntity.badRequest().body(new ResponseDTO("Account already exists with the provided PAN number", 400, null));
         }
         // Generate unique account number
         String accountNumber = generateAccountNumber();
@@ -61,6 +70,54 @@ public class AccountServiceImpl implements AccountService{
         return ResponseEntity.ok(
                 new ResponseDTO("Account created successfully",
                         201,mapToAccountResponseDTO(newAccount)));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO> getAllAccounts() {
+        Iterable<Account> accounts = accountRepository.findAll();
+        if(!accounts.iterator().hasNext()){
+            return ResponseEntity.ok(new ResponseDTO("No accounts found", 200, List.of()));
+        }
+        List<AccountResponseDTO> accountResponseDTOs = ((List<Account>) accounts).stream()
+                .map(this::mapToAccountResponseDTO)
+                .toList();
+        return ResponseEntity.ok(new ResponseDTO("Accounts fetched successfully", 200, accountResponseDTOs));
+
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO> getAccountByAccountNumber(String accountNumber) {
+        if(accountNumber == null || accountNumber.isEmpty()){
+            return ResponseEntity.badRequest().body(new ResponseDTO("Account number is required", 400, null));
+        }
+        Optional<Account> account = accountRepository.findByAccountNumber(accountNumber);
+        if(account == null){
+            return ResponseEntity.status(404).body(new ResponseDTO("Account not found with account number: " + accountNumber, 404, null));
+        }
+        return ResponseEntity.ok(new ResponseDTO("Account fetched successfully", 200, mapToAccountResponseDTO(account.get())));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO> partialUpdateAccount(String accountNumber, AccountRequestDTO accountRequest) {
+        Optional<Account> existingAccountOpt = accountRepository.findByAccountNumber(accountNumber);
+        if(existingAccountOpt.isEmpty()){
+            return ResponseEntity.status(404).body(new ResponseDTO("Account not found with account number: " + accountNumber, 404, null));
+        }
+        Account existingAccount = existingAccountOpt.get();
+        if(accountRequest.getAccountType() != null){
+            existingAccount.setAccountType(accountRequest.getAccountType());
+        }
+        if(accountRequest.getAadhaarNumber()!=null){
+            existingAccount.setAccountNumber(accountRequest.getAadhaarNumber());
+        }
+        if(accountRequest.getPanNumber()!=null){
+            existingAccount.setPanNumber(accountRequest.getPanNumber());
+        }
+        if(accountRequest.getBalance()!=null){
+            existingAccount.setBalance(accountRequest.getBalance());
+        }
+        accountRepository.save(existingAccount);
+        return ResponseEntity.ok(new ResponseDTO("Account updated successfully", 200, mapToAccountResponseDTO(existingAccount)));
     }
 
 

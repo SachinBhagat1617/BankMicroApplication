@@ -6,4 +6,10 @@ import org.springframework.http.ResponseEntity;
 
 public interface AccountService {
     ResponseEntity<ResponseDTO> createAccount(AccountRequestDTO accountRequest);
+
+    ResponseEntity<ResponseDTO> getAllAccounts();
+
+    ResponseEntity<ResponseDTO> getAccountByAccountNumber(String accountNumber);
+
+    ResponseEntity<ResponseDTO> partialUpdateAccount(String accountNumber, AccountRequestDTO accountRequest);
 }
